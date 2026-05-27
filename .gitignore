@@ -1,0 +1,11 @@
+.env
+__pycache__/
+nb2ob.egg-info/
+dist/
+build/
+*.egg
+*.egg-info/
+
+.venv/
+*.pyc
+
