@@ -1,6 +1,5 @@
-<p align="center">
-  <img src="icon/icon.png" width="60" />
-  <h1 align="center">nb2ob</h1>
+<p align="left">
+  <img src="icon/banner.svg" />
 </p>
 
 ---
