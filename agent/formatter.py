@@ -2,7 +2,9 @@
 Handles formatting of raw NotebookLM text into Obsidian markdown notes.
 """
 
-from litellm import completion
+import litellm as lt
+lt._turn_on_debug()
+# from litellm import completion
 
 from agent.prompt import get_prompt
 from config import Config
@@ -21,7 +23,7 @@ class Agent:
 
     def format_note(self, raw_text: str) -> str:
 
-        response = completion(
+        response = lt.completion(
             model=self.model,
             api_key=self.api_key,
             messages=[

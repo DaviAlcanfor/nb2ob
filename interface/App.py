@@ -1,5 +1,7 @@
 import customtkinter as ctk
 from typing import Callable
+from PIL import Image, ImageTk 
+from pathlib import Path
 
 from interface.components import (
     AppTitle,
@@ -11,6 +13,10 @@ from interface.components import (
 from interface.themes import BACKGROUND
 
 
+img = Image.open("icon/icon.png").convert("RGBA")
+img.save("icon/icon.ico", format="ICO", sizes=[(256, 256)])
+
+ICON_PATH = Path(__file__).parent.parent / "icon" / "icon.ico"
 
 _WIDTH = 760
 _HEIGHT = 400
@@ -31,6 +37,10 @@ class App(ctk.CTk):
         self._on_send = on_send
 
         self.title(_PROJECT_NAME)
+        self.resizable(False, False)
+        
+        self.iconbitmap(str(ICON_PATH))
+
         self.geometry(_GEOMETRY)
         self.configure(fg_color=BACKGROUND)
         self._setup_widgets()

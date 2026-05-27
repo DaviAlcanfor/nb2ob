@@ -1,4 +1,9 @@
-# nb2ob
+<p align="center">
+  <img src="icon/icon.png" width="60" />
+  <h1 align="center">nb2ob</h1>
+</p>
+
+---
 
 Transforms [NotebookLM](https://notebooklm.google.com/) outputs into structured [Obsidian](https://obsidian.md/) notes automatically.
 
