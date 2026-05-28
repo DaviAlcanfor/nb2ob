@@ -1,0 +1,26 @@
+import functools
+from infrastructure.config import get_logger
+
+
+def log_call(func):
+    logger = get_logger(func.__module__)
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        
+        logger.debug(f"{func.__name__} called")
+        
+        try:
+            result = func(*args, **kwargs)
+            logger.debug(f"{func.__name__} finished")
+            
+            return result
+        
+        except Exception as e:
+            logger.error(f"{func.__name__} falhou: {e}")
+            raise
+
+    return wrapper
+
+
+__all__ = ['log_call']
