@@ -162,12 +162,6 @@ Any model supported by [LiteLLM](https://docs.litellm.ai/docs/providers). Just s
 
 ---
 
-## Credits
-
-Thanks to [@lucasdonini](https://github.com/lucasdonini) for introducing me to uv.
-
----
-
 ## License
 
 MIT
