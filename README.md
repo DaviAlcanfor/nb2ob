@@ -22,7 +22,7 @@ No copying, no pasting, no manual formatting.
 
 ## How it works
 
-```
+```text
 You paste the NotebookLM output
           │
           ▼
@@ -39,7 +39,7 @@ You paste the NotebookLM output
 
 ## Generated template
 
-Every note follows this structure:
+Every note follows this structure (written in Brazilian Portuguese):
 
 ```markdown
 ---
@@ -48,32 +48,41 @@ tags: []
 source: NotebookLM
 ---
 
-## Summary
-## Key points
-## Questions
-## To explore
+## Resumo
+## Pontos principais
+## Dúvidas
+## Para explorar
 ```
 
 ---
 
 ## Project structure
 
-```
+```text
 nb2ob/
 ├── main.py
 ├── config.py
 │
 ├── agent/
-│   ├── prompt.py       # template and prompt generation
-│   └── formatter.py    # LLM call via LiteLLM
+│   ├── prompt.py           # template and prompt generation
+│   └── formatter.py        # LLM call via LiteLLM
 │
 ├── api/
-│   └── obsidian.py     # Obsidian Local REST API wrapper
+│   └── obsidian.py         # Obsidian Local REST API wrapper
+│
+├── infrastructure/
+│   ├── config.py           # colored logger setup
+│   └── decorators.py       # log_call decorator
 │
 └── interface/
-    ├── app.py          # main window
-    ├── components.py   # UI components
-    └── theme.py        # colors and styles
+    ├── App.py              # main window
+    ├── themes.py           # colors and styles
+    └── components/
+        ├── AppTitle.py
+        ├── Button.py
+        ├── FileNameInput.py
+        ├── StatusMessage.py
+        └── TextInput.py
 ```
 
 ---
@@ -83,7 +92,7 @@ nb2ob/
 - [Python 3.11+](https://www.python.org/)
 - [uv](https://docs.astral.sh/uv/)
 - [Obsidian](https://obsidian.md/) with the **Local REST API** plugin installed and active
-- API key from any supported provider (Claude, Gemini, etc.)
+- API key from any supported provider (Groq, Gemini, Anthropic, etc.)
 
 ### Installing the Obsidian plugin
 
@@ -115,15 +124,12 @@ cp .env.example .env
 ```
 
 ```env
-OBSIDIAN_TOKEN=your_token_here
+OBSIDIAN_TOKEN=<your_bearer_api_key_here>
 OBSIDIAN_HOST=https://127.0.0.1
 OBSIDIAN_PORT=27124
 
-AGENT_MODEL=gemini/gemini-2.0-flash
-
-# Add the key for the provider you're using
-ANTHROPIC_API_KEY=
-GEMINI_API_KEY=
+AGENT_MODEL=groq/llama-3.3-70b-versatile
+AGENT_API_KEY=<your_api_key_here>
 ```
 
 ### 4. Run
@@ -140,6 +146,7 @@ Any model supported by [LiteLLM](https://docs.litellm.ai/docs/providers). Just s
 
 | Provider | Example |
 | --- | --- |
+| Groq (default) | `groq/llama-3.3-70b-versatile` |
 | Google Gemini | `gemini/gemini-2.0-flash` |
 | Anthropic | `claude-sonnet-4-20250514` |
 | OpenAI | `gpt-4o` |
@@ -158,7 +165,6 @@ Any model supported by [LiteLLM](https://docs.litellm.ai/docs/providers). Just s
 ## Credits
 
 Thanks to [@lucasdonini](https://github.com/lucasdonini) for introducing me to uv.
-
 
 ---
 
