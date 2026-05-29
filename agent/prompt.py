@@ -24,11 +24,11 @@ tags: []
 source: NotebookLM
 ---
 
-## 📋 Resumo
+## \U0001f4cb Resumo
 Write a full paragraph covering ALL major themes in the material.
 Do not reduce to a few lines. If the material has 5 topics, all 5 must appear here.
 
-## 📚 Conteúdo
+## \U0001f4da Conteúdo
 
 For each section or topic found in the material, create a subsection with an appropriate emoji in the title:
 
@@ -36,9 +36,11 @@ For each section or topic found in the material, create a subsection with an app
 - Explain every concept in clear, didactic language
 - Preserve ALL technical terms, commands, and tool names exactly as they appear
 - Use nested bullet points for sub-concepts or hierarchies
-- When the material contains code, reproduce it in a fenced code block with the correct language tag
 - Bold **key terms** on first mention
 - Do not skip anything — if it was in the source, it must be in the note
+- For each concept, write at least 2-3 sentences of explanation, not just a one-liner
+- Include practical examples when the source provides them
+- When the material contains code, reproduce it in a fenced code block using triple backticks followed by the language name (java, xml, kotlin, python, etc), then the code, then closing triple backticks
 
 Rules:
 - Write everything in Brazilian Portuguese

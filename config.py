@@ -13,6 +13,7 @@ class Config:
     obsidian_token: str = os.getenv("OBSIDIAN_TOKEN")
     obsidian_host: str = os.getenv("OBSIDIAN_HOST", "https://127.0.0.1")
     obsidian_port: int = int(os.getenv("OBSIDIAN_PORT", "27124"))
+    obsidian_folder: str = os.getenv("OBSIDIAN_FOLDER", "NotebookLM")
 
 
     def __post_init__(self):

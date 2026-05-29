@@ -15,14 +15,13 @@ class ObsidianAPI:
     _STATUS_SUCCESS = 204
 
     def __init__(self, config: Config = None):
-        
+    
         if config is None:
             config = Config()
 
         self.token = config.obsidian_token
+        self.folder = config.obsidian_folder
         
-        # Endpoints: https://coddingtonbear.github.io/obsidian-local-rest-api/
-        # this on im using is the vault, which allows us to create and write into a new file
         self.api_url = f"{config.obsidian_host}:{config.obsidian_port}/vault/"
 
     @log_call
@@ -32,7 +31,7 @@ class ObsidianAPI:
             note_content: str
         ) -> bool:
 
-        URL = f"{self.api_url}{note_title}.md"
+        URL = f"{self.api_url}{self.folder}/{note_title}.md"
 
         response = requests.put(
             URL, 

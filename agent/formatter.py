@@ -31,6 +31,7 @@ class Agent:
         response = lt.completion(
             model=self.model,
             api_key=self.api_key,
+            max_tokens=8192,
             messages=[
                 {"role": "system", "content": self.prompt},
                 {"role": "user", "content": raw_text}
