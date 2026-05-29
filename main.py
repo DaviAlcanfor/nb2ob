@@ -1,16 +1,28 @@
 from agent.formatter import Agent
 from api.obsidian import ObsidianAPI
+from api.notebooklm import NotebookLMAPI
 from interface.App import App
 
 agent = Agent()
 obsidian = ObsidianAPI()
+notebooklm = NotebookLMAPI()
 
 
-def on_send(raw_text: str, file_name: str) -> bool:
-    formatted = agent.format_note(raw_text)
-    
-    return obsidian.send_to_obsidian(file_name, formatted)
+def on_load() -> list[dict]:
+    return notebooklm.list_notebooks()
+
+
+def on_sync(notebook_ids: list[str]) -> bool:
+    contents = notebooklm.sync_notebooks(notebook_ids)
+
+    results = []
+    for title, raw_text in contents.items():
+        formatted = agent.format_note(raw_text)
+        success = obsidian.send_to_obsidian(title, formatted)
+        results.append(success)
+
+    return all(results)
 
 
 if __name__ == "__main__":
-    App(on_send=on_send).run()
+    App(on_load=on_load, on_sync=on_sync).run()
