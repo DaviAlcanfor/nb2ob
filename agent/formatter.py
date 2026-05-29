@@ -3,11 +3,15 @@ Handles formatting of raw NotebookLM text into Obsidian markdown notes.
 """
 
 import litellm as lt
-lt._turn_on_debug()
-# from litellm import completion
+
+lt.set_verbose = False
+lt.suppress_debug_info = True
 
 from agent.prompt import get_prompt
 from config import Config
+from infrastructure.decorators import get_logger, log_call
+
+logger = get_logger(__name__)
 
 
 class Agent:
@@ -21,6 +25,7 @@ class Agent:
         self.prompt = get_prompt()
 
 
+    @log_call
     def format_note(self, raw_text: str) -> str:
 
         response = lt.completion(

@@ -7,26 +7,25 @@ or update notes in the vault.
 """
 
 import requests
+
 from config import Config
-
-CONFIG = Config()
-
-
-_OBSIDIAN_HOST = CONFIG.obsidian_host
-_OBSIDIAN_PORT = CONFIG.obsidian_port
-_OBSIDIAN_TOKEN = CONFIG.obsidian_token
-
-_API_URL = f"{_OBSIDIAN_HOST}:{_OBSIDIAN_PORT}/vault/"
-
+from infrastructure.decorators import log_call
 
 class ObsidianAPI:
-    _STATUS_SUCCESS = 200
+    _STATUS_SUCCESS = 204
 
-    def __init__(self):
-        self.token = _OBSIDIAN_TOKEN
-        self.api_url = _API_URL
+    def __init__(self, config: Config = None):
+        
+        if config is None:
+            config = Config()
 
+        self.token = config.obsidian_token
+        
+        # Endpoints: https://coddingtonbear.github.io/obsidian-local-rest-api/
+        # this on im using is the vault, which allows us to create and write into a new file
+        self.api_url = f"{config.obsidian_host}:{config.obsidian_port}/vault/"
 
+    @log_call
     def send_to_obsidian(
             self,
             note_title: str, 
