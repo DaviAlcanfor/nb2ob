@@ -8,7 +8,7 @@ or update notes in the vault.
 
 import requests
 
-from config import Config
+from config.settings import Config
 from infrastructure.decorators import log_call
 
 class ObsidianAPI:

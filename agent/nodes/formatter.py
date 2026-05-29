@@ -7,8 +7,8 @@ import litellm as lt
 lt.set_verbose = False
 lt.suppress_debug_info = True
 
-from agent.prompt import get_prompt
-from config import Config
+from agent.prompts.formatter import get_prompt
+from config.settings import Config
 from infrastructure.decorators import get_logger, log_call
 
 logger = get_logger(__name__)

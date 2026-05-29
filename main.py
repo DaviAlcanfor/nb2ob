@@ -1,4 +1,4 @@
-from agent.formatter import Agent
+from agent.nodes.formatter import Agent
 from api.obsidian import ObsidianAPI
 from api.notebooklm import NotebookLMAPI
 from interface.App import App
