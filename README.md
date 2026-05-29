@@ -4,17 +4,18 @@
 
 ---
 
-Transforms [NotebookLM](https://notebooklm.google.com/) outputs into structured [Obsidian](https://obsidian.md/) notes automatically.
+Automatically syncs [NotebookLM](https://notebooklm.google.com/) notebooks into structured [Obsidian](https://obsidian.md/) notes.
 
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)
 ![LiteLLM](https://img.shields.io/badge/LiteLLM-latest-6D28D9?style=flat)
 ![Obsidian](https://img.shields.io/badge/Obsidian-Local%20REST%20API-7C3AED?style=flat)
+![NotebookLM](https://img.shields.io/badge/NotebookLM-unofficial-4285F4?style=flat&logo=google)
 
 ---
 
 ## What nb2ob does
 
-Paste the NotebookLM output, give the file a name, hit send — the note shows up in your vault, formatted and ready.
+Connect your Google account, select which notebooks to sync, hit Sync — notes show up in your vault, formatted and ready.
 
 No copying, no pasting, no manual formatting.
 
@@ -23,7 +24,7 @@ No copying, no pasting, no manual formatting.
 ## How it works
 
 ```text
-You paste the NotebookLM output
+notebooklm-py pulls notebook content
           │
           ▼
      Agent formats via LLM
@@ -37,21 +38,16 @@ You paste the NotebookLM output
 
 ---
 
-## Generated template
+## Generated note structure
 
 Every note follows this structure (written in Brazilian Portuguese):
 
 ```markdown
----
-date: YYYY-MM-DD
-tags: []
-source: NotebookLM
----
+## 📋 Resumo
 
-## Resumo
-## Pontos principais
-## Dúvidas
-## Para explorar
+## 📚 Conteúdo
+### 🔹 [Topic]
+...
 ```
 
 ---
@@ -68,6 +64,7 @@ nb2ob/
 │   └── formatter.py        # LLM call via LiteLLM
 │
 ├── api/
+│   ├── notebooklm.py       # NotebookLM unofficial API wrapper
 │   └── obsidian.py         # Obsidian Local REST API wrapper
 │
 ├── infrastructure/
@@ -80,7 +77,6 @@ nb2ob/
     └── components/
         ├── AppTitle.py
         ├── Button.py
-        ├── FileNameInput.py
         ├── StatusMessage.py
         └── TextInput.py
 ```
@@ -92,6 +88,7 @@ nb2ob/
 - [Python 3.11+](https://www.python.org/)
 - [uv](https://docs.astral.sh/uv/)
 - [Obsidian](https://obsidian.md/) with the **Local REST API** plugin installed and active
+- A Google account with access to [NotebookLM](https://notebooklm.google.com/)
 - API key from any supported provider (Groq, Gemini, Anthropic, etc.)
 
 ### Installing the Obsidian plugin
@@ -115,9 +112,18 @@ cd nb2ob
 
 ```bash
 uv sync
+playwright install chromium
 ```
 
-### 3. Configure environment
+### 3. Authenticate with Google
+
+```bash
+notebooklm login
+```
+
+This opens a browser for you to sign in with your Google account. Credentials are stored locally.
+
+### 4. Configure environment
 
 ```bash
 cp .env.example .env
@@ -127,12 +133,13 @@ cp .env.example .env
 OBSIDIAN_TOKEN=<your_bearer_api_key_here>
 OBSIDIAN_HOST=https://127.0.0.1
 OBSIDIAN_PORT=27124
+OBSIDIAN_FOLDER=NotebookLM
 
 AGENT_MODEL=groq/llama-3.3-70b-versatile
 AGENT_API_KEY=<your_api_key_here>
 ```
 
-### 4. Run
+### 5. Run
 
 ```bash
 uv run main.py
@@ -155,10 +162,17 @@ Any model supported by [LiteLLM](https://docs.litellm.ai/docs/providers). Just s
 
 ## Main dependencies
 
+- [notebooklm-py](https://github.com/teng-lin/notebooklm-py) — unofficial NotebookLM Python API
 - [LiteLLM](https://github.com/BerriAI/litellm) — unified interface for multiple LLMs
 - [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) — GUI
 - [requests](https://docs.python-requests.org/) — Obsidian API communication
 - [python-dotenv](https://github.com/theskumar/python-dotenv) — environment variables
+
+---
+
+## ⚠️ Disclaimer
+
+`notebooklm-py` is an unofficial library that uses undocumented Google APIs. It is not affiliated with Google and may break without notice. Use at your own risk.
 
 ---
 
