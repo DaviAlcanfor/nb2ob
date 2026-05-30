@@ -1,16 +1,71 @@
-from agent.formatter import Agent
-from api.obsidian import ObsidianAPI
-from interface.App import App
+from typing import TypedDict
 
-agent = Agent()
-obsidian = ObsidianAPI()
+import typer
+
+from agent.graph import build_graph
+from api import NotebookLMAPI, ObsidianAPI
+
+app = typer.Typer(help="nb2ob — sync NotebookLM notebooks to Obsidian")
 
 
-def on_send(raw_text: str, file_name: str) -> bool:
-    formatted = agent.format_note(raw_text)
+class SyncReport(TypedDict):
+    total_notebooks: int
+    notes_failed: int
+
+
+def _check_obsidian(obsidian_api: ObsidianAPI) -> None:
     
-    return obsidian.send_to_obsidian(file_name, formatted)
+    if not obsidian_api.is_running():
+        typer.echo("Obsidian is not running. Open Obsidian and enable the Local REST API plugin.")
+        raise typer.Exit(code=1)
+
+
+def _fetch_notebooks(notebooklm_api: NotebookLMAPI) -> list:
+    try:
+        return notebooklm_api.list_notebook_sources()
+    
+    except Exception:
+        typer.echo("NotebookLM session invalid. Run: notebooklm login")
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def sync():
+    """
+    Fetches notebooks from NotebookLM, processes them through the agent pipeline,
+    and writes the formatted notes to Obsidian.
+    """
+
+    notebooklm_api = NotebookLMAPI()
+    obsidian_api   = ObsidianAPI()
+    pipeline       = build_graph()
+
+    _check_obsidian(obsidian_api)
+
+    typer.echo("Fetching notebooks from NotebookLM...")
+    notebooks = _fetch_notebooks(notebooklm_api)
+
+    report: SyncReport = {
+        "total_notebooks": len(notebooks),
+        "notes_failed": 0,
+    }
+
+    for nb in notebooks:
+        result = pipeline.invoke({
+            "notebooks":     [nb],
+            "called_agents": [],
+        })
+
+        for note in result["formatted_notes"]:
+            if not obsidian_api.send_to_obsidian(
+                notebook_title=note["notebook_title"],
+                note_title=note["file_title"],
+                note_content=note["content"],
+            ):
+                report["notes_failed"] += 1
+
+    typer.echo(f"Notebooks processed: {report['total_notebooks']}, Notes failed: {report['notes_failed']}")
 
 
 if __name__ == "__main__":
-    App(on_send=on_send).run()
+    app()

@@ -8,8 +8,9 @@ or update notes in the vault.
 
 import requests
 
-from config import Config
+from config.settings import Config
 from infrastructure.decorators import log_call
+
 
 class ObsidianAPI:
     _STATUS_SUCCESS = 204
@@ -22,16 +23,39 @@ class ObsidianAPI:
         self.token = config.obsidian_token
         self.folder = config.obsidian_folder
         
-        self.api_url = f"{config.obsidian_host}:{config.obsidian_port}/vault/"
+        self.base_url = f"{config.obsidian_host}:{config.obsidian_port}"
+        self.api_url  = f"{self.base_url}/vault/"
+        
+    
+    def is_running(self) -> bool:
+        """
+        Checks if Obsidian is open and the Local REST API plugin is active.
+
+        Returns:
+            bool: True if reachable, False otherwise
+        """
+        try:
+            response = requests.get(
+                self.base_url,
+                headers={"Authorization": f"Bearer {self.token}"},
+                verify=False,
+                timeout=3,
+            )
+            return response.status_code == 200
+        
+        except requests.ConnectionError:
+            return False    
+        
 
     @log_call
     def send_to_obsidian(
             self,
+            notebook_title: str,
             note_title: str, 
             note_content: str
         ) -> bool:
 
-        URL = f"{self.api_url}{self.folder}/{note_title}.md"
+        URL = f"{self.api_url}{self.folder}/{notebook_title}/{note_title}.md"
 
         response = requests.put(
             URL, 
