@@ -29,12 +29,14 @@ def formatter_node(
         for source in state["cleaned_sources"]
     }
 
+    notebook_title = state["notebooks"][0]["title"]
     formatted_notes = [
         {
+            "notebook_title": notebook_title,
             "file_title": file["file_title"],
             "content": chain.invoke({
                 "content": json.dumps(
-                    {
+                    {   
                         "title": file["file_title"],
                         "sources": [
                             cleaned_by_id[sid]["cleaned_content"]

@@ -22,15 +22,22 @@ class Cluster(TypedDict):
     source_ids: list[str]
 
 
-class Fileplan(TypedDict):
+class FormattedNote(TypedDict):
+    notebook_title: str 
+    file_title: str
+    content: str
+
+
+class FilePlan(TypedDict):
     file_title: str
     source_ids: list[str]
 
 
 class PipelineState(TypedDict):
-    notebooks:          list[Notebook]         
-    cleaned_sources:    list[CleanedSource]    
-    summarized_sources: list[SummarizedSource] 
-    clusters:           list[Cluster]          
-    file_plan:          list[Fileplan]         
+    notebooks:          list[Notebook]
+    cleaned_sources:    list[CleanedSource]
+    summarized_sources: list[SummarizedSource]
+    clusters:           list[Cluster]
+    file_plan:          list[FilePlan]
+    formatted_notes:    list[FormattedNote]
     called_agents:      Annotated[list[str], operator.add]

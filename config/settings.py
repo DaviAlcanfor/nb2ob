@@ -12,7 +12,7 @@ class Config:
     obsidian_host: str = os.getenv("OBSIDIAN_HOST", "https://127.0.0.1")
     obsidian_port: int = int(os.getenv("OBSIDIAN_PORT", "27124"))
     obsidian_folder: str = os.getenv("OBSIDIAN_FOLDER", "NotebookLM")
-
+    
     # LLM Providers
     gemini_api_key: str = os.getenv("GEMINI_API_KEY")
     groq_api_key: str = os.getenv("GROQ_API_KEY")
