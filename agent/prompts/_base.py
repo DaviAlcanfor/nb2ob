@@ -9,7 +9,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 
 class BasePrompt:
-    OUTPUT_LANGUAGE: str = "Brazilian Portuguese"
+    OUTPUT_LANGUAGE: str = "English"
     SYSTEM_PROMPT: str = ""
 
     @classmethod
