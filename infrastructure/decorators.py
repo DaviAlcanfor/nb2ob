@@ -17,7 +17,7 @@ def log_call(func):
             return result
         
         except Exception as e:
-            logger.error(f"{func.__name__} falhou: {e}")
+            logger.error(f"{func.__name__} failed: {e}")
             raise
 
     return wrapper
