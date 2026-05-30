@@ -1,13 +1,13 @@
 <p align="left">
-  <img src="icon/banner.svg" />
+  <img src="docs/banner.svg" />
 </p>
 
 ---
 
-Automatically syncs [NotebookLM](https://notebooklm.google.com/) notebooks into structured [Obsidian](https://obsidian.md/) notes.
+Automatically syncs [NotebookLM](https://notebooklm.google.com/) notebooks into structured [Obsidian](https://obsidian.md/) notes via a multi-agent LLM pipeline.
 
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)
-![LiteLLM](https://img.shields.io/badge/LiteLLM-latest-6D28D9?style=flat)
+![LangGraph](https://img.shields.io/badge/LangGraph-latest-1C7A3A?style=flat)
 ![Obsidian](https://img.shields.io/badge/Obsidian-Local%20REST%20API-7C3AED?style=flat)
 ![NotebookLM](https://img.shields.io/badge/NotebookLM-unofficial-4285F4?style=flat&logo=google)
 
@@ -15,32 +15,44 @@ Automatically syncs [NotebookLM](https://notebooklm.google.com/) notebooks into 
 
 ## What nb2ob does
 
-Connect your Google account, select which notebooks to sync, hit Sync — notes show up in your vault, formatted and ready.
+Fetches all your NotebookLM notebooks and their sources, runs them through an agent pipeline that cleans, summarizes, clusters, and formats the content, then writes the result as structured markdown notes directly into your Obsidian vault.
 
-No copying, no pasting, no manual formatting.
+No copying. No pasting. No manual formatting.
 
 ---
 
 ## How it works
 
 ```text
-notebooklm-py pulls notebook content
+notebooklm-py pulls notebooks + sources
           │
           ▼
-     Agent formats via LLM
+     Cleaner — removes noise from raw source content
           │
           ▼
-  Obsidian Local REST API
+     Summarizer — generates a lightweight summary per source
           │
           ▼
-  Note created in vault ✓
+     Clusterizer — groups sources by topic
+          │
+          ▼
+     Orchestrator — decides which clusters become files
+          │
+          ▼
+     Formatter — writes structured markdown per file
+          │
+          ▼
+  Obsidian Local REST API — saves notes to vault
+          │
+          ▼
+  NotebookLM/{notebook}/{topic}.md ✓
 ```
+
+Each notebook becomes a folder in your vault. Each topic cluster becomes a `.md` file inside it.
 
 ---
 
 ## Generated note structure
-
-Every note follows this structure (written in Brazilian Portuguese):
 
 ```markdown
 ## 📋 Resumo
@@ -56,29 +68,28 @@ Every note follows this structure (written in Brazilian Portuguese):
 
 ```text
 nb2ob/
-├── main.py
-├── config.py
+├── main.py                     # CLI entry point (typer)
 │
 ├── agent/
-│   ├── prompt.py           # template and prompt generation
-│   └── formatter.py        # LLM call via LiteLLM
+│   ├── graph.py                # builds and compiles the LangGraph pipeline
+│   ├── state.py                # PipelineState and TypedDicts
+│   ├── nodes/                  # one file per agent (cleaner, summarizer, etc.)
+│   └── prompts/                # one file per agent + base.py
 │
 ├── api/
-│   ├── notebooklm.py       # NotebookLM unofficial API wrapper
-│   └── obsidian.py         # Obsidian Local REST API wrapper
+│   ├── __init__.py
+│   ├── notebooklm.py           # NotebookLM unofficial API wrapper
+│   └── obsidian.py             # Obsidian Local REST API wrapper
+│
+├── config/
+│   ├── settings.py             # Config dataclass with env var validation
+│   └── models.py               # Model enum
 │
 ├── infrastructure/
-│   ├── config.py           # colored logger setup
-│   └── decorators.py       # log_call decorator
+│   ├── config.py               # logger setup
+│   └── decorators.py           # log_call decorator
 │
-└── interface/
-    ├── App.py              # main window
-    ├── themes.py           # colors and styles
-    └── components/
-        ├── AppTitle.py
-        ├── Button.py
-        ├── StatusMessage.py
-        └── TextInput.py
+└── docs/                       # images used in this README
 ```
 
 ---
@@ -89,13 +100,7 @@ nb2ob/
 - [uv](https://docs.astral.sh/uv/)
 - [Obsidian](https://obsidian.md/) with the **Local REST API** plugin installed and active
 - A Google account with access to [NotebookLM](https://notebooklm.google.com/)
-- API key from any supported provider (Groq, Gemini, Anthropic, etc.)
-
-### Installing the Obsidian plugin
-
-`Settings → Community Plugins → Browse → search "Local REST API" → install → enable`
-
-After enabling, copy your token at: `Settings → Local REST API`
+- API key from at least one supported provider (Groq, Gemini, or Anthropic)
 
 ---
 
@@ -115,31 +120,52 @@ uv sync
 playwright install chromium
 ```
 
-### 3. Authenticate with Google
+### 3. Install and configure the Obsidian plugin
+
+Open Obsidian and go to `Settings → Community Plugins`.
+
+<img src="docs/obsidian_home_print.png" width="600"/>
+
+Click **Browse** and search for **Local REST API with MCP**.
+
+<img src="docs/obsidian_search_plugins.png" width="400"/>
+
+Install and enable it. Then go to `Settings → Local REST API & MCP Server` to find your bearer token.
+
+<img src="docs/obsidian_plugin_install.png" width="600"/>
+
+Copy the token — you'll need it in the next step.
+
+<img src="docs/obsidian_bearer_screen.png" width="600"/>
+
+### 4. Authenticate with NotebookLM
 
 ```bash
 notebooklm login
 ```
 
-This opens a browser for you to sign in with your Google account. Credentials are stored locally.
+This opens a browser for you to sign in with your Google account. Credentials are stored locally and reused on subsequent runs. If the session expires, run it again.
 
-### 4. Configure environment
+### 5. Configure environment variables
 
 ```bash
 cp .env.example .env
 ```
 
 ```env
-OBSIDIAN_TOKEN=<your_bearer_api_key_here>
-OBSIDIAN_HOST=https://127.0.0.1
-OBSIDIAN_PORT=27124
-OBSIDIAN_FOLDER=NotebookLM
+# Obsidian Local REST API
+OBSIDIAN_TOKEN=<your_bearer_token>      # from Settings > Local REST API & MCP Server
+OBSIDIAN_HOST=https://127.0.0.1        # change only if you modified the plugin settings
+OBSIDIAN_PORT=27124                    # change only if you modified the plugin settings
+OBSIDIAN_FOLDER=NotebookLM             # root folder in your vault where notes will be saved
 
-AGENT_MODEL=groq/llama-3.3-70b-versatile
-AGENT_API_KEY=<your_api_key_here>
+# LLM Provider (at least one required)
+GROQ_API_KEY=<your_groq_api_key>       # https://console.groq.com/keys
+GEMINI_API_KEY=<your_gemini_api_key>   # https://aistudio.google.com/apikey
+ANTHROPIC_API_KEY=<your_anthropic_key> # https://console.anthropic.com/keys
 ```
 
-### 5. Run
+### 6. Run
 
 ```bash
 uv run main.py
@@ -149,22 +175,22 @@ uv run main.py
 
 ## Supported models
 
-Any model supported by [LiteLLM](https://docs.litellm.ai/docs/providers). Just set `AGENT_MODEL` in your `.env`.
+At least one API key is required. The pipeline currently uses Groq by default.
 
-| Provider | Example |
-| --- | --- |
-| Groq (default) | `groq/llama-3.3-70b-versatile` |
-| Google Gemini | `gemini/gemini-2.0-flash` |
-| Anthropic | `claude-sonnet-4-20250514` |
-| OpenAI | `gpt-4o` |
+| Provider  | Models                          | Get key |
+|-----------|---------------------------------|---------|
+| Groq      | `llama-3.3-70b-versatile`       | [console.groq.com](https://console.groq.com/keys) |
+| Gemini    | `gemini-2.0-flash`              | [aistudio.google.com](https://aistudio.google.com/apikey) |
+| Anthropic | `claude-sonnet-4-20250514`      | [console.anthropic.com](https://console.anthropic.com/keys) |
 
 ---
 
 ## Main dependencies
 
 - [notebooklm-py](https://github.com/teng-lin/notebooklm-py) — unofficial NotebookLM Python API
-- [LiteLLM](https://github.com/BerriAI/litellm) — unified interface for multiple LLMs
-- [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) — GUI
+- [LangChain + LangGraph](https://github.com/langchain-ai/langgraph) — agent pipeline orchestration
+- [langchain-groq](https://python.langchain.com/docs/integrations/chat/groq/) — Groq LLM integration
+- [typer](https://typer.tiangolo.com/) — CLI
 - [requests](https://docs.python-requests.org/) — Obsidian API communication
 - [python-dotenv](https://github.com/theskumar/python-dotenv) — environment variables
 

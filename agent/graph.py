@@ -23,7 +23,7 @@ def build_graph():
 
     config = Config()
 
-    llm = ChatGroq(Model.LLAMA_3_3_VERSATILE, config.groq_api_key)
+    llm = ChatGroq(model=Model.LLAMA_3_3_VERSATILE, api_key=config.groq_api_key)
     # other llms
 
     graph = StateGraph(PipelineState)
