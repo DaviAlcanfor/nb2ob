@@ -1,41 +1,55 @@
-"""
-Handles formatting of raw NotebookLM text into Obsidian markdown notes.
-"""
+import json
 
-import litellm as lt
+from langchain_core.language_models import BaseLanguageModel
+from langchain_core.output_parsers import StrOutputParser
 
-lt.set_verbose = False
-lt.suppress_debug_info = True
-
-from agent.prompts.formatter import get_prompt
-from config.settings import Config
-from infrastructure.decorators import get_logger, log_call
-
-logger = get_logger(__name__)
+from agent.prompts.formatter import FormatterPrompt
+from agent.state import PipelineState
 
 
-class Agent:
-    def __init__(self, config: Config = None):
+def formatter_node(
+    state: PipelineState,
+    llm: BaseLanguageModel
+) -> dict:
+    """
+    Creates a node for the formatter agent
 
-        if config is None:
-            config = Config()
+    Args:
+        state (PipelineState): state with the current values of context
+        llm (BaseLanguageModel): the language model for the agent
 
-        self.model = config.agent_model
-        self.api_key = config.agent_api_key
-        self.prompt = get_prompt()
+    Returns:
+        dict: returns the updated keys from state
+    """
 
+    chain = FormatterPrompt.get_prompt() | llm | StrOutputParser()
 
-    @log_call
-    def format_note(self, raw_text: str) -> str:
+    cleaned_by_id = {
+        source["id"]: source
+        for source in state["cleaned_sources"]
+    }
 
-        response = lt.completion(
-            model=self.model,
-            api_key=self.api_key,
-            max_tokens=8192,
-            messages=[
-                {"role": "system", "content": self.prompt},
-                {"role": "user", "content": raw_text}
-            ]
-        )
+    formatted_notes = [
+        {
+            "file_title": file["file_title"],
+            "content": chain.invoke({
+                "content": json.dumps(
+                    {
+                        "title": file["file_title"],
+                        "sources": [
+                            cleaned_by_id[sid]["cleaned_content"]
+                            for sid in file["source_ids"]
+                            if sid in cleaned_by_id
+                        ]
+                    },
+                    ensure_ascii=False
+                )
+            })
+        }
+        for file in state["file_plan"]
+    ]
 
-        return response.choices[0].message.content
+    return {
+        "formatted_notes": formatted_notes,
+        "called_agents": ["formatter"]
+    }

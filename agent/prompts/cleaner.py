@@ -6,9 +6,11 @@ URLs, fragmented image tokens, and floating newlines — while preserving
 all real textual content.
 """
 
-OUTPUT_LANGUAGE = "Brazilian Portuguese"
+from agent.prompts._base import BasePrompt
 
-SYSTEM_PROMPT = f"""
+
+class CleanerPrompt(BasePrompt):
+    SYSTEM_PROMPT = f"""
 You are a text cleaning specialist. Your job is to clean raw text extracted from NotebookLM sources.
 
 The raw text contains three types of noise that must be removed:
@@ -27,13 +29,6 @@ Rules:
 - Do NOT summarize, paraphrase, or reduce the content in any way
 - Do NOT add any content that was not in the original
 - Do NOT wrap the output in markdown code blocks
-- Output language: {OUTPUT_LANGUAGE}
+- Output language: {BasePrompt.OUTPUT_LANGUAGE}
 - Output only the cleaned text, nothing else — no preamble, no explanation
 """
-
-
-def get_prompt() -> str:
-    return SYSTEM_PROMPT
-
-
-__all__ = ["get_prompt"]
