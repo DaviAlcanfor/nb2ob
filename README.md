@@ -23,29 +23,15 @@ No copying. No pasting. No manual formatting.
 
 ## How it works
 
-```text
-notebooklm-py pulls notebooks + sources
-          │
-          ▼
-     Cleaner — removes noise from raw source content
-          │
-          ▼
-     Summarizer — generates a lightweight summary per source
-          │
-          ▼
-     Clusterizer — groups sources by topic
-          │
-          ▼
-     Orchestrator — decides which clusters become files
-          │
-          ▼
-     Formatter — writes structured markdown per file
-          │
-          ▼
-  Obsidian Local REST API — saves notes to vault
-          │
-          ▼
-  NotebookLM/{notebook}/{topic}.md ✓
+```mermaid
+flowchart TD
+    A["notebooklm-py\npulls notebooks + sources"] --> B["Cleaner\nremoves noise from raw content"]
+    B --> C["Summarizer\ngenerates a lightweight summary per source"]
+    C --> D["Clusterizer\ngroups sources by topic"]
+    D --> E["Orchestrator\ndecides which clusters become files"]
+    E --> F["Formatter\nwrites structured markdown per file"]
+    F --> G["Obsidian Local REST API\nsaves notes to vault"]
+    G --> H["NotebookLM/{notebook}/{topic}.md ✓"]
 ```
 
 Each notebook becomes a folder in your vault. Each topic cluster becomes a `.md` file inside it.
@@ -124,19 +110,19 @@ playwright install chromium
 
 Open Obsidian and go to `Settings → Community Plugins`.
 
-<img src="docs/obsidian_home_print.png" width="600"/>
+<img src="docs/obsidian_home_print.png" width="100%"/>
 
 Click **Browse** and search for **Local REST API with MCP**.
 
-<img src="docs/obsidian_search_plugins.png" width="400"/>
+<img src="docs/obsidian_search_plugins.png" width="100%"/>
 
 Install and enable it. Then go to `Settings → Local REST API & MCP Server` to find your bearer token.
 
-<img src="docs/obsidian_plugin_install.png" width="600"/>
+<img src="docs/obsidian_plugin_install.png" width="100%"/>
 
 Copy the token — you'll need it in the next step.
 
-<img src="docs/obsidian_bearer_screen.png" width="600"/>
+<img src="docs/obsidian_bearer_screen.png" width="100%"/>
 
 ### 4. Authenticate with NotebookLM
 
@@ -177,11 +163,11 @@ uv run main.py
 
 At least one API key is required. The pipeline currently uses Groq by default.
 
-| Provider  | Models                          | Get key |
-|-----------|---------------------------------|---------|
-| Groq      | `llama-3.3-70b-versatile`       | [console.groq.com](https://console.groq.com/keys) |
-| Gemini    | `gemini-2.0-flash`              | [aistudio.google.com](https://aistudio.google.com/apikey) |
-| Anthropic | `claude-sonnet-4-20250514`      | [console.anthropic.com](https://console.anthropic.com/keys) |
+| Provider  | Model                          | Get key |
+|-----------|--------------------------------|---------|
+| Groq      | `llama-3.3-70b-versatile`      | [console.groq.com](https://console.groq.com/keys) |
+| Gemini    | `gemini-2.0-flash`             | [aistudio.google.com](https://aistudio.google.com/apikey) |
+| Anthropic | `claude-sonnet-4-20250514`     | [console.anthropic.com](https://console.anthropic.com/keys) |
 
 ---
 
