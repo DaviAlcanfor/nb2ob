@@ -22,4 +22,5 @@ dependencies = [
     "python-dotenv>=1.2.2",
     "requests>=2.34.2",
     "typer>=0.25.1",
+    "yaspin>=3.4.0",
 ]

@@ -27,10 +27,11 @@ def clusterizer_node(
     sources_input = json.dumps(
         [
             {
-                "id": source["id"], 
+                "id": source["id"],
                 "summary": source["summary"]
             }
-            for source in state["summarized_sources"]
+            for nb in state["notebooks"]
+            for source in nb["summaries"]
         ],
         ensure_ascii=False
     )
