@@ -22,11 +22,9 @@ class Agent(Enum):
         self.agent_name = agent_name
         self.prompt = prompt
     
-    CLEANER =      ("cleaner",      CleanerPrompt)
     CLUSTERIZER =  ("clusterizer",  ClusterizerPrompt)
     FORMATTER =    ("formatter",    FormatterPrompt)
     ORCHESTRATOR = ("orchestrator", OrchestratorPrompt)
-    SUMMARIZER =   ("summarizer",   SummarizerPrompt)
 
 
 
