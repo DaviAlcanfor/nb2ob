@@ -4,27 +4,16 @@ NotebookLM API wrapper for listing notebooks and extracting content.
 
 import asyncio
 from notebooklm import NotebookLMClient
-from typing import List, TypedDict
+from typing import List
 
+from api._types import Notebook, Sources, SummarizedSource
+from api._cleaning import _clean_content
+from api._summarizer import _build_summary_prompt, _parse_summaries
 from infrastructure.decorators import get_logger, log_call
 
 logger = get_logger(__name__)
 
-class Sources(TypedDict):
-    id: str
-    title: str
-    content: str
 
-class Notebook(TypedDict):
-    id: str
-    title: str
-    sources_count: int
-    sources: List[Sources]
-
-
-# Possible to replace the 
-# `async with NotebookLMClient.from_storage() as client:` 
-# repetition with a function or dependency injection at the class
 class NotebookLMAPI:
 
     @log_call
@@ -74,7 +63,7 @@ class NotebookLMAPI:
                 SourcesList.append({
                     "id": sr.id,
                     "title": sr.title,
-                    "content": fulltext.content
+                    "content": _clean_content(fulltext.content)
                 })
         
         return SourcesList
@@ -93,9 +82,32 @@ class NotebookLMAPI:
         for nb in notebooks:
             sources = await self._fetch_sources(nb["id"])
             nb["sources"] = sources
-        
+            nb["summaries"] = await self._summarize_sources(nb["id"], sources)
+
         return notebooks
         
+
+    async def _ask_notebook(self, notebook_id: str, prompt: str) -> str:
+        async with NotebookLMClient.from_storage() as client:
+            result = await client.chat.ask(notebook_id, prompt)
+        return result.answer
+
+    @log_call
+    async def _summarize_sources(self, notebook_id: str, sources: List[Sources]) -> List[SummarizedSource]:
+        """
+        Summarizes all sources in a single chat.ask call per notebook.
+
+        Args:
+            notebook_id: str
+            sources: List[Sources]
+
+        Returns:
+            List[SummarizedSource]
+        """
+        title_to_id, prompt = _build_summary_prompt(sources)
+        answer = await self._ask_notebook(notebook_id, prompt)
+        
+        return _parse_summaries(answer, title_to_id)
         
 
     def list_notebooks(self) -> list[dict]:

@@ -1,5 +1,6 @@
 from typing import TypedDict
 import typer
+from notebooklm.exceptions import AuthError, NetworkError, RPCTimeoutError
 
 from agent.graph import build_graph
 from api import NotebookLMAPI, ObsidianAPI
@@ -16,9 +17,17 @@ class SyncReport(TypedDict):
 def _fetch_notebooks(notebooklm_api: NotebookLMAPI) -> list:
     try:
         return notebooklm_api.list_notebook_sources()
-    
-    except Exception:
+
+    except AuthError:
         typer.echo("NotebookLM session invalid. Run: notebooklm login")
+        raise typer.Exit(code=1)
+
+    except (NetworkError, RPCTimeoutError) as e:
+        typer.echo(f"Connection error while fetching notebooks: {e}")
+        raise typer.Exit(code=1)
+
+    except Exception as e:
+        typer.echo(f"Unexpected error: {e}")
         raise typer.Exit(code=1)
 
 
