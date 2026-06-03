@@ -19,6 +19,15 @@ _PROMPT_TEMPLATE = (
 
 
 def _build_summary_prompt(sources):
+    """
+    Builds the summarization prompt and a title-to-id mapping from sources.
+
+    Args:
+        sources: List[Sources]
+
+    Returns:
+        tuple: (title_to_id dict, formatted prompt string)
+    """
     
     title_to_id= {}
     titles = []
@@ -32,20 +41,35 @@ def _build_summary_prompt(sources):
 
 
 def _parse_summaries(answer: str, title_to_id: dict) -> List:
+    """
+    Parses the chat.ask response into a list of SummarizedSource dicts.
+
+    Args:
+        answer: raw text response from NotebookLM
+        title_to_id: mapping of source title to source id
+
+    Returns:
+        List[SummarizedSource]
+    """
     summaries = []
     
     for item in (_parse_summary_line(line) for line in answer.splitlines()):
     
-        if item is None:
+        if not item:
             continue
     
         title, summary = item
         source_id = title_to_id.get(title)
     
-        if source_id is None:
+        if not source_id:
             logger.warning(f"Unmatched title in summary response: {title!r}")
             continue
-        summaries.append({"id": source_id, "title": title, "summary": summary})
+        
+        summaries.append({
+            "id": source_id, 
+            "title": title, 
+            "summary": summary
+        })
     
     return summaries
 
