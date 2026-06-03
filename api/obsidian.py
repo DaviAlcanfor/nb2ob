@@ -8,6 +8,8 @@ or update notes in the vault.
 
 import requests
 import typer
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from config.settings import Config
 from infrastructure.decorators import log_call
