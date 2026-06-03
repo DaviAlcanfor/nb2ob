@@ -1,9 +1,9 @@
 from typing import TypedDict
-
 import typer
 
 from agent.graph import build_graph
 from api import NotebookLMAPI, ObsidianAPI
+from infrastructure.display import display_banner
 
 app = typer.Typer(help="nb2ob — sync NotebookLM notebooks to Obsidian")
 
@@ -11,13 +11,6 @@ app = typer.Typer(help="nb2ob — sync NotebookLM notebooks to Obsidian")
 class SyncReport(TypedDict):
     total_notebooks: int
     notes_failed: int
-
-
-def _check_obsidian(obsidian_api: ObsidianAPI) -> None:
-    
-    if not obsidian_api.is_running():
-        typer.echo("Obsidian is not running. Open Obsidian and enable the Local REST API plugin.")
-        raise typer.Exit(code=1)
 
 
 def _fetch_notebooks(notebooklm_api: NotebookLMAPI) -> list:
@@ -35,12 +28,13 @@ def sync():
     Fetches notebooks from NotebookLM, processes them through the agent pipeline,
     and writes the formatted notes to Obsidian.
     """
-
+    display_banner()
+    
     notebooklm_api = NotebookLMAPI()
     obsidian_api   = ObsidianAPI()
     pipeline       = build_graph()
 
-    _check_obsidian(obsidian_api)
+    obsidian_api.check_or_exit()
 
     typer.echo("Fetching notebooks from NotebookLM...")
     notebooks = _fetch_notebooks(notebooklm_api)

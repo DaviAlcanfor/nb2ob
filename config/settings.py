@@ -17,6 +17,9 @@ class Config:
     gemini_api_key: str = os.getenv("GEMINI_API_KEY")
     groq_api_key: str = os.getenv("GROQ_API_KEY")
     anthropic_api_key: str = os.getenv("ANTHROPIC_API_KEY")
+    cerebras_api_key: str = os.getenv("CEREBRAS_API_KEY")
+    openrouter_api_key: str = os.getenv("OPEN_ROUTER_KEY")
+    openrouter_base_url: str = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 
 
     def __post_init__(self):
@@ -37,7 +40,7 @@ class Config:
             errors.append(f"Missing Obsidian vars: {', '.join(obsidian_missing)}")
         
         if no_agent_key:
-            errors.append("At least one API key is required (gemini_api_key, groq_api_key, anthropic_api_key)")
+            errors.append("At least one API key is required (gemini_api_key, groq_api_key, anthropic_api_key, cerebras_api_key, openrouter_api_key)")
         
         if errors:
             raise EnvironmentError("\n" + "\n".join(errors))

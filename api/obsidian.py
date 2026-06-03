@@ -7,6 +7,7 @@ or update notes in the vault.
 """
 
 import requests
+import typer
 
 from config.settings import Config
 from infrastructure.decorators import log_call
@@ -69,3 +70,11 @@ class ObsidianAPI:
         
         return response.status_code == self._STATUS_SUCCESS
         
+
+    def check_or_exit(self) -> None:
+        """
+        Checks if Obsidian is running. Exits the CLI if not.
+        """
+        if not self.is_running():
+            typer.echo("Obsidian is not running. Open Obsidian and enable the Local REST API plugin.")
+            raise typer.Exit(code=1)
