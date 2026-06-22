@@ -6,12 +6,17 @@ import asyncio
 from notebooklm import NotebookLMClient
 from typing import List
 
+import typer
+
 from api._types import Notebook, Sources, SummarizedSource
 from api._cleaning import _clean_content
 from api._summarizer import _build_summary_prompt, _parse_summaries
 from infrastructure.decorators import get_logger, log_call
 
 logger = get_logger(__name__)
+
+DELAY_BETWEEN_SOURCES = 2
+DELAY_BETWEEN_NOTEBOOKS = 4
 
 
 class NotebookLMAPI:
@@ -59,6 +64,7 @@ class NotebookLMAPI:
             SourcesList: list[Sources] = []
             for sr in sources:
                 fulltext = await client.sources.get_fulltext(notebook_id, sr.id)
+                await asyncio.sleep(DELAY_BETWEEN_SOURCES)
                 
                 SourcesList.append({
                     "id": sr.id,
@@ -69,23 +75,24 @@ class NotebookLMAPI:
         return SourcesList
     
     @log_call
-    async def _fetch_all(self) -> List[Notebook]:
-        """
-        Fetchs both the notebook with the sources inputed
-        
-        Returns:
-            NotebookList: List[Notebook] - list of notebook with sources inputed
-        """
-        
+    async def _fetch_all(self, notebook_name: str | None = None) -> List[Notebook]:
         notebooks = await self._fetch_notebooks()
-        
+
+        if notebook_name:
+            notebooks = [nb for nb in notebooks if nb["title"] == notebook_name]
+
+            if not notebooks:
+                typer.echo(f"Notebook '{notebook_name}' not found.")
+                raise typer.Exit(code=1)
+
         for nb in notebooks:
             sources = await self._fetch_sources(nb["id"])
             nb["sources"] = sources
             nb["summaries"] = await self._summarize_sources(nb["id"], sources)
+            await asyncio.sleep(DELAY_BETWEEN_NOTEBOOKS)
 
         return notebooks
-        
+            
 
     async def _ask_notebook(self, notebook_id: str, prompt: str) -> str:
         async with NotebookLMClient.from_storage() as client:
@@ -116,5 +123,5 @@ class NotebookLMAPI:
     def list_sources(self, notebook_id) -> list[dict]:
         return asyncio.run(self._fetch_sources(notebook_id))
 
-    def list_notebook_sources(self) -> list[dict]:
-        return asyncio.run(self._fetch_all())
+    def list_notebook_sources(self, notebook_name: str | None = None) -> list[dict]:
+        return asyncio.run(self._fetch_all(notebook_name))

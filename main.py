@@ -14,9 +14,9 @@ class SyncReport(TypedDict):
     notes_failed: int
 
 
-def _fetch_notebooks(notebooklm_api: NotebookLMAPI) -> list:
+def _fetch_notebooks(notebooklm_api: NotebookLMAPI, notebook_name: str | None = None) -> list:
     try:
-        return notebooklm_api.list_notebook_sources()
+        return notebooklm_api.list_notebook_sources(notebook_name)
 
     except AuthError:
         typer.echo("NotebookLM session invalid. Run: notebooklm login")
@@ -32,13 +32,15 @@ def _fetch_notebooks(notebooklm_api: NotebookLMAPI) -> list:
 
 
 @app.command()
-def sync():
+def sync(
+    notebook: str = typer.Option(None, "--notebook", help="Sync a specific notebook by name"),
+):
     """
     Fetches notebooks from NotebookLM, processes them through the agent pipeline,
     and writes the formatted notes to Obsidian.
     """
     display_banner()
-    
+
     notebooklm_api = NotebookLMAPI()
     obsidian_api   = ObsidianAPI()
     pipeline       = build_graph()
@@ -46,7 +48,7 @@ def sync():
     obsidian_api.check_or_exit()
 
     typer.echo("Fetching notebooks from NotebookLM...")
-    notebooks = _fetch_notebooks(notebooklm_api)
+    notebooks = _fetch_notebooks(notebooklm_api, notebook)
 
     report: SyncReport = {
         "total_notebooks": len(notebooks),
