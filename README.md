@@ -65,14 +65,32 @@ The remaining 3 agents — Clusterizer, Orchestrator, and Formatter — still ru
 
 ---
 
-## Generated note structure
+## Result
+
+After a full run across 13 notebooks, nb2ob generates a structured folder tree in your vault:
+
+<img src="docs/obsidian_result.png" width="45%"/>
+
+Each note follows this structure:
 
 ```markdown
-## 📋 Resumo
+---
+tags: []
+source: NotebookLM
+---
 
-## 📚 Conteúdo
-### 🔹 [Topic]
-...
+## 📋 Resume
+3 to 5 sentences covering the main themes of the material.
+
+## 📚 Content
+
+### 🔹 Topic Name
+- Concept explained in clear, didactic language
+- **Key terms** bolded on first mention
+
+```bash
+# commands and code snippets preserved exactly
+```
 ```
 
 ---
@@ -190,9 +208,19 @@ OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 
 ### 6. Run
 
+Sync all notebooks:
+
 ```bash
 uv run main.py
 ```
+
+Sync a single notebook by name:
+
+```bash
+uv run main.py --notebook "DevOps"
+```
+
+<img src="docs/terminal_run.png" width="100%"/>
 
 ---
 
