@@ -13,7 +13,10 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 from config.settings import Config
 from infrastructure.decorators import log_call
+from infrastructure.config import get_logger
 
+
+log = get_logger(__name__)
 
 class ObsidianAPI:
     _STATUS_SUCCESS = 204
@@ -57,7 +60,9 @@ class ObsidianAPI:
             note_title: str, 
             note_content: str
         ) -> bool:
-
+        
+        log.info(f"Sending {notebook_title} to obsidian")
+        
         URL = f"{self.api_url}{self.folder}/{notebook_title}/{note_title}.md"
 
         response = requests.put(

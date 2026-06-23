@@ -62,7 +62,9 @@ class NotebookLMAPI:
             sources = await client.sources.list(notebook_id)
             
             SourcesList: list[Sources] = []
-            for sr in sources:
+            for sr in sources:                
+                logger.info(f"Fetching source: {sr.title}")
+                
                 fulltext = await client.sources.get_fulltext(notebook_id, sr.id)
                 await asyncio.sleep(DELAY_BETWEEN_SOURCES)
                 

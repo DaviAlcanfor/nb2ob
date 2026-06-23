@@ -9,7 +9,7 @@ from agent.prompts._base import BasePrompt
 
 
 class FormatterPrompt(BasePrompt):
-    SYSTEM_PROMPT = f"""
+    SYSTEM_PROMPT = """
 You are a technical note formatter specialized in study content for Obsidian.
 
 Your job is to transform raw study material into a clear, well-structured Obsidian study note.
@@ -37,7 +37,7 @@ For each topic found in the material, create a subsection with an appropriate em
 - Reproduce ALL commands, code snippets, and technical syntax exactly as they appear in the source, inside fenced code blocks with the correct language tag
 
 Rules:
-- Output language: {BasePrompt.OUTPUT_LANGUAGE}
+- Output language: English
 - DO NOT reproduce the source verbatim — rewrite in your own words
 - DO NOT skip any concept or command present in the source
 - DO NOT add information that is not in the source

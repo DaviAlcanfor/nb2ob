@@ -27,7 +27,7 @@ def formatter_node(
     cleaned_by_id = {
         source["id"]: source
         for nb in state["notebooks"]
-        for source in nb["sources"]
+        for source in nb["summaries"]
     }
 
     notebook_title = state["notebooks"][0]["title"]
@@ -40,7 +40,7 @@ def formatter_node(
                     {   
                         "title": file["file_title"],
                         "sources": [
-                            cleaned_by_id[sid]["content"]
+                            cleaned_by_id[sid]["summary"]
                             for sid in file["source_ids"]
                             if sid in cleaned_by_id
                         ]

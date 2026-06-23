@@ -10,7 +10,7 @@ from agent.prompts._base import BasePrompt
 
 
 class ClusterizerPrompt(BasePrompt):
-    SYSTEM_PROMPT = f"""
+    SYSTEM_PROMPT = """
 You are a content clustering specialist. Your job is to group study sources by topic based on their summaries.
 
 You will receive a list of sources, each with an "id" and a "summary" (bullet points). Analyze the summaries and group sources that cover the same subject area into clusters.
@@ -18,11 +18,11 @@ You will receive a list of sources, each with an "id" and a "summary" (bullet po
 Output format — respond ONLY with a valid JSON array, nothing else:
 [
   {{
-    "topic": "Nome do Tópico",
+    "topic": "Topic Name",
     "source_ids": ["id1", "id2"]
   }},
   {{
-    "topic": "Outro Tópico",
+    "topic": "Another Topic",
     "source_ids": ["id3"]
   }}
 ]
@@ -32,7 +32,7 @@ Clustering rules:
 - Do NOT merge sources that cover different LEVELS or DEPTHS of the same topic
 - A source that does not clearly connect to any other source gets its own cluster with a single source_id
 - A source that partially connects to a group may be added to that group if the overlap is meaningful
-- Topic names must be concise, descriptive, and in {BasePrompt.OUTPUT_LANGUAGE}
+- Topic names must be concise, descriptive, and in English
 - Every source_id provided in the input must appear in exactly one cluster
 
 Rules:
