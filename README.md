@@ -69,7 +69,8 @@ The remaining 3 agents — Clusterizer, Orchestrator, and Formatter — still ru
 
 After a full run across 13 notebooks, nb2ob generates a structured folder tree in your vault:
 
-<img src="docs/obsidian_result.png" width="45%"/>
+TESTE
+<img src="docs/obsidia_result.png" width="45%"/>
 
 Each note follows this structure:
 
@@ -220,7 +221,8 @@ Sync a single notebook by name:
 uv run main.py --notebook "DevOps"
 ```
 
-<img src="docs/terminal_run.png" width="100%"/>
+TESTE
+<img src="docs/termina_run.png" width="100%"/>
 
 ---
 
