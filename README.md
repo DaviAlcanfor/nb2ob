@@ -67,9 +67,9 @@ The remaining 3 agents — Clusterizer, Orchestrator, and Formatter — still ru
 
 ## Result
 
-After a full run across 13 notebooks, nb2ob generates a structured folder tree in your vault:
+After a full run across all your notebooks, nb2ob generates a structured folder tree in your vault:
 
-<img src="docs/obsidian_result.png" width="45%"/>
+<img src="docs/obsidian_result.png" width="100%"/>
 
 Each note follows this structure:
 
