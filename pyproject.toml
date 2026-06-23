@@ -24,3 +24,5 @@ dependencies = [
     "typer>=0.25.1",
     "yaspin>=3.4.0",
 ]
+[tool.pytest.ini_options]
+pythonpath = ["."]

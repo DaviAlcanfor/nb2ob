@@ -46,10 +46,10 @@ class TestCleanContent:
         result = _clean_content(content)
         assert result == "first line second line"
 
-    def test_preserves_double_newlines(self):
+    def test_double_newline_becomes_single_space(self):
         content = "paragraph one\n\nparagraph two"
         result = _clean_content(content)
-        assert "\n\n" in result
+        assert result == "paragraph one paragraph two"
 
     def test_strips_surrounding_whitespace(self):
         assert _clean_content("  clean content  ") == "clean content"
